@@ -1,0 +1,14 @@
+#!/bin/sh /etc/rc.common
+
+START=10
+STOP=15
+ 
+start() {        
+        echo Starting command1 daemon
+        service_start /bin/command1
+}                 
+ 
+stop() {          
+        echo Killing command1 daemon
+        service_stop /bin/command1 
+}
