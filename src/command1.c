@@ -88,17 +88,13 @@ void send_command(int fd, bool isOn, int device) {
 }
 
 
-int main(void) {
+int main(int argc, char *argv[]) {
   printf("Commanding remote\n\n");
 
   int fd = open_port();
-  send_command(fd, true, 1);
-  send_command(fd, true, 2);
-  send_command(fd, true, 3);
-  sleep(1);
-  send_command(fd, false, 1);
-  send_command(fd, false, 2);
-  send_command(fd, false, 3);
+  bool isOn = strcmp(argv[1], "on") == 0 ? true : false;
+
+  send_command(fd, isOn, argv[2][0] - '0');
 
   return 0;
 }
