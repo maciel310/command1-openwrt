@@ -11,6 +11,7 @@ define Package/command1
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=Command1 Controller
+	DEPENDS:=+libcurl +libssp +libopenssl
 endef
 
 define Package/command1/description
@@ -29,7 +30,7 @@ define Package/command1/install
 	$(INSTALL_DIR) $(1)/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/command1 $(1)/bin/
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/command1.init $(1)/etc/init.d/command1
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init $(1)/etc/init.d/command1
 endef
 
 
