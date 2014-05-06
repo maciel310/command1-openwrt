@@ -11,7 +11,7 @@ define Package/command1
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=Command1 Controller
-	DEPENDS:=+libcurl +libssp +libopenssl
+	DEPENDS:=+libcurl
 endef
 
 define Package/command1/description

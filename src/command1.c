@@ -138,6 +138,7 @@ void curl_test() {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
