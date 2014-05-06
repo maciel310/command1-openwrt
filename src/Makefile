@@ -2,10 +2,10 @@ INCLUDE = -Iusr/local/include
 LDFLAGS = -Lusr/local/lib
 LDLIBS = -lcurl -lm
 
-command1: command1.o cJSON.o
-	$(CC) command1.o cJSON.o -o command1 $(INCLUDE) $(LDFLAGS) $(LDLIBS) 
-command1.o: command1.c
-	$(CC) $(CFLAGS) -c command1.c
+command1: command1.o cJSON.o firebase.o
+	$(CC) command1.o cJSON.o firebase.o -o command1 $(INCLUDE) $(LDFLAGS) $(LDLIBS) 
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
 cJSON.o: cjson/cJSON.c
 	$(CC) -c cjson/cJSON.c
 
