@@ -1,12 +1,6 @@
 #include "firebase.h"
 
-#include <stdio.h>
-#include <errno.h>
-#include <termios.h>
-#include <unistd.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <stdbool.h>
 #include <curl/curl.h>
 #include "cjson/cJSON.h"
