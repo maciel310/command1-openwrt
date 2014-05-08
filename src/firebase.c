@@ -5,19 +5,8 @@
 #include <curl/curl.h>
 #include "cjson/cJSON.h"
 
-void server_sent_event_callback(char* event, char* dataString) {
-  printf("%s: %s\n", event, dataString);
-  if(strcmp(event, "put") == 0) {
-    cJSON *json = cJSON_Parse(dataString);
-    if(strcmp("/event", cJSON_GetObjectItem(json,"path")->valuestring) == 0) {
-      char *lightEvent = cJSON_GetObjectItem(json,"data")->valuestring;
 
-      printf("Event: %s\n\n", lightEvent);
-    }
-  }
-}
-
-size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void *d) {
+size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void (*firebase_callback)(char*, char*)) {
   int realsize = size*nmemb;
 
   char str[realsize+1];
@@ -37,11 +26,11 @@ size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void *d) {
     }
   }
   
-  server_sent_event_callback(event, data);
+  firebase_callback(event, data);
   return realsize;
 }
 
-void firebase_subscribe(char* url) {
+void firebase_subscribe(char* url, void (*firebase_callback)(char*, char*)) {
   CURL *curl;
   CURLcode res;
 
@@ -54,6 +43,7 @@ void firebase_subscribe(char* url) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, firebase_callback);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
     res = curl_easy_perform(curl);
