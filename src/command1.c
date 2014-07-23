@@ -45,7 +45,9 @@ int main(int argc, char *argv[]) {
   
     send_command(fd, isOn, argv[2][0] - '0');
   } else {
-    firebase_subscribe("https://test.firebaseio.com/me.json", server_sent_event_callback);
+    while (true) {
+      firebase_subscribe("https://test.firebaseio.com/me.json", server_sent_event_callback);
+    }
   }
 
   return 0;
