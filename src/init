@@ -1,11 +1,11 @@
 #!/bin/sh /etc/rc.common
 
-START=10
+START=90
 STOP=15
  
 start() {        
         echo Starting command1 daemon
-        service_start /bin/command1
+        service_start /bin/command1 &
 }                 
  
 stop() {          

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "cjson/cJSON.h"
 #include "firebase.h"
 #include "serial.h"
@@ -45,8 +46,10 @@ int main(int argc, char *argv[]) {
   
     send_command(fd, isOn, argv[2][0] - '0');
   } else {
+    sleep(10);
     while (true) {
       firebase_subscribe("https://test.firebaseio.com/me.json", server_sent_event_callback);
+      sleep(30);
     }
   }
 
