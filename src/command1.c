@@ -46,9 +46,12 @@ int main(int argc, char *argv[]) {
   
     send_command(fd, isOn, argv[2][0] - '0');
   } else {
+    firebase_set_url("https://test.firebaseio.com/me.json");
+    firebase_set_callback(server_sent_event_callback);
+
     sleep(10);
     while (true) {
-      firebase_subscribe("https://test.firebaseio.com/me.json", server_sent_event_callback);
+      firebase_subscribe();
       sleep(30);
     }
   }

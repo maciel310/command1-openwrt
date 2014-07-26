@@ -5,6 +5,8 @@
 #include <curl/curl.h>
 #include "cjson/cJSON.h"
 
+char* gUrl;
+void (*gCallback)();
 
 size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void (*firebase_callback)(char*, char*)) {
   int realsize = size*nmemb;
@@ -30,7 +32,15 @@ size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void (*firebase_callb
   return realsize;
 }
 
-void firebase_subscribe(char* url, void (*firebase_callback)(char*, char*)) {
+void firebase_set_url(char* url) {
+  gUrl = url;
+}
+
+void firebase_set_callback(void (*firebase_callback)()) {
+  gCallback = firebase_callback;
+}
+
+void firebase_subscribe() {
   CURL *curl;
   CURLcode res;
 
@@ -39,11 +49,11 @@ void firebase_subscribe(char* url, void (*firebase_callback)(char*, char*)) {
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(headers, "Accept: text/event-stream");
 
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_URL, gUrl);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, firebase_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, gCallback);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
     res = curl_easy_perform(curl);
