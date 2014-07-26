@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include "cjson/cJSON.h"
 #include "firebase.h"
 #include "serial.h"
 
@@ -26,17 +25,6 @@ void parse_event_string(char* event) {
   send_command(fd, isOn, event[strlen(event)-1] - '0');
 }
 
-void server_sent_event_callback(char* event, char* dataString) {
-  if(strcmp(event, "put") == 0) {
-    cJSON *json = cJSON_Parse(dataString);
-    if(strcmp("/event", cJSON_GetObjectItem(json,"path")->valuestring) == 0) {
-      char *lightEvent = cJSON_GetObjectItem(json,"data")->valuestring;
-
-      parse_event_string(lightEvent);
-    }
-  }
-}
-
 int main(int argc, char *argv[]) {
   if(argc > 1) {
     printf("Commanding remote\n\n");
@@ -46,8 +34,8 @@ int main(int argc, char *argv[]) {
   
     send_command(fd, isOn, argv[2][0] - '0');
   } else {
-    firebase_set_url("https://test.firebaseio.com/me.json");
-    firebase_set_callback(server_sent_event_callback);
+    firebase_set_url("https://test.firebaseio.com/me/event.json");
+    firebase_set_callback("/event", parse_event_string);
 
     sleep(10);
     while (true) {

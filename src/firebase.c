@@ -6,10 +6,19 @@
 #include "cjson/cJSON.h"
 
 char* gUrl;
+char* gCallbackPath;
 void (*gCallback)();
 
-size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void (*firebase_callback)(char*, char*)) {
+bool isFirstResponse;
+
+size_t WriteCallback(void *ptr, size_t size, size_t nmemb,
+    void (*firebase_callback)(char*)) {
   int realsize = size*nmemb;
+
+  if (isFirstResponse) {
+    isFirstResponse = false;
+    return realsize;
+  }
 
   char str[realsize+1];
   char* cpy;
@@ -28,7 +37,16 @@ size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void (*firebase_callb
     }
   }
   
-  firebase_callback(event, data);
+  if (strcmp(event, "put") == 0) {
+    cJSON *json = cJSON_Parse(data);
+    if(strcmp(gCallbackPath,
+        cJSON_GetObjectItem(json,"path")->valuestring) == 0) {
+      char *firebaseEvent = cJSON_GetObjectItem(json,"data")->valuestring;
+
+      firebase_callback(firebaseEvent);
+    }
+  }
+
   return realsize;
 }
 
@@ -36,8 +54,9 @@ void firebase_set_url(char* url) {
   gUrl = url;
 }
 
-void firebase_set_callback(void (*firebase_callback)()) {
+void firebase_set_callback(char* path, void (*firebase_callback)()) {
   gCallback = firebase_callback;
+  gCallbackPath = path;
 }
 
 void firebase_subscribe() {
@@ -46,6 +65,8 @@ void firebase_subscribe() {
 
   curl = curl_easy_init();
   if(curl) {
+    isFirstResponse = true;
+
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(headers, "Accept: text/event-stream");
 
