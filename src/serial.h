@@ -1,6 +1,4 @@
-int set_interface_attribs (int fd, int speed, int parity);
+#include <stdbool.h>
 
-void set_blocking (int fd, int should_block);
-
-
-int open_port();
+void init_sender_serial();
+void send_command_serial(bool, int);

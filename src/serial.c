@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <termios.h>
 
+int fd;
+
 int set_interface_attribs (int fd, int speed, int parity) {
   struct termios tty;
   memset (&tty, 0, sizeof tty);
@@ -66,3 +68,21 @@ int open_port() {
 
   return fd;
 }
+
+
+void init_sender_serial() {
+  fd = open_port();
+}
+
+void send_command_serial(bool isOn, int device) {
+  char cmd[2];
+  cmd[0] = (isOn ? '1' : '0');
+  cmd[1] = '0' + device;
+  cmd[2] = '\0';
+
+  write(fd, cmd, 2);
+
+  char buf[4];
+  int n = read(fd, buf, sizeof buf);
+}
+
