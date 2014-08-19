@@ -6,14 +6,24 @@
 #include "serial.h"
 #include "gpio.h"
 
-#define _USE_SERIAL_
-#ifdef _USE_SERIAL_
-  void (*send_command)(bool, int) = send_command_serial;
-  void (*init_sender)() = init_sender_serial;
-#else
-  void (*send_command)(bool, int) = send_command_gpio;
-  void (*init_sender)() = init_sender_gpio;
-#endif
+
+bool useSerial = true;
+
+void init_sender() {
+  if (useSerial) {
+    init_sender_serial();
+  } else {
+    init_sender_gpio();
+  }
+}
+
+void send_command(bool isOn, int device) {
+  if (useSerial) {
+    send_command_serial(isOn, device);
+  } else {
+    send_command_gpio(isOn, device);
+  }
+}
 
 void parse_event_string(char* event) {
   bool isOn = (strncmp(event, "on", 2) == 0);
