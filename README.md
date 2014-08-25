@@ -34,12 +34,12 @@ A daemon will be installed that will automatically run the command1 client on bo
 
 You can also manually start the command1 binary using the following commandline arguments:
 
-Usage: command1 [OPTION...]
-  -s, --use-serial=     Use Serial sender
-  -g, --use-gpio=       Use GPIO sender
-  -d, --device=         Device to command
-  -1, --on=             Turns selected device on
-  -0, --off=            Turns selected device off
-  -f, --firebase=       Firebase hostname to connect to.
+    Usage: command1 [OPTION...]
+        -s, --use-serial=     Use Serial sender
+        -g, --use-gpio=       Use GPIO sender
+        -d, --device=         Device to command
+        -1, --on=             Turns selected device on
+        -0, --off=            Turns selected device off
+        -f, --firebase=       Firebase hostname to connect to.
 
 The {device, on, off} options and the {firebase} options are mutually exclusive. By specifying the `firebase` option the program will enter daemon mode, listening for commands from the firebase server indicated.
