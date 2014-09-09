@@ -18,7 +18,7 @@ Download/build the appropriate SDK for your version and architecture of OpenWRT.
     cd package/
     git clone https://github.com/maciel310/command1-openwrt.git
     cd ..
-    make
+    make package/command1-openwrt/compile
 
 
 You should then have a file named command1_*.ipk somewhere in your bin/ folder. The exact file name and path will vary based on your architecture and SDK version.
@@ -30,4 +30,16 @@ Once you have the ipk file, get it to your router somehow (scp, wget, etc), then
 Running
 ================
 
-SSH/Telnet into your router, then run `command1` to start the controller. The command line parameter syntax is still a work in progress.
+A daemon will be installed that will automatically run the command1 client on boot. If you don't want this to run, you can disable it by running `/etc/init.d/command1 disable`.
+
+You can also manually start the command1 binary using the following commandline arguments:
+
+    Usage: command1 [OPTION...]
+        -s, --use-serial=     Use Serial sender
+        -g, --use-gpio=       Use GPIO sender
+        -d, --device=         Device to command
+        -1, --on=             Turns selected device on
+        -0, --off=            Turns selected device off
+        -f, --firebase=       Firebase hostname to connect to.
+
+The {device, on, off} options and the {firebase} options are mutually exclusive. By specifying the `firebase` option the program will enter daemon mode, listening for commands from the firebase server indicated.
