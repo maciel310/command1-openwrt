@@ -13,7 +13,7 @@
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
 
-int gpioNumber = 14;
+int gpioNumber;
 int gpio_fd;
 
 const int PULSE_LENGTH = 1750;
@@ -134,7 +134,8 @@ void close_gpio() {
   close(gpio_fd);
 }
 
-void init_sender_gpio() {
+void init_sender_gpio(int selected_pin) {
+  gpioNumber = selected_pin;
   export_gpio();
   output_gpio();
 }

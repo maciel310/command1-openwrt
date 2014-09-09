@@ -10,13 +10,14 @@
 
 enum sender_type { SERIAL, GPIO };
 enum sender_type selected_sender = SERIAL;
+int selected_gpio_pin = 0;
 
 
 void init_sender() {
   if (selected_sender == SERIAL) {
     init_sender_serial();
   } else {
-    init_sender_gpio();
+    init_sender_gpio(selected_gpio_pin);
   }
 }
 
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
     {"on", '1', POPT_ARG_VAL, &isOn, true, "Turns selected device on", ""},
     {"off", '0', POPT_ARG_VAL, &isOn, false, "Turns selected device off", ""},
     {"firebase", 'f', POPT_ARG_STRING, &firebase_host, 0, "Firebase hostname to connect to.", ""},
+    {"gpio-pin", 'p', POPT_ARG_INT, &selected_gpio_pin, 0, "GPIO pin to use", ""},
     POPT_AUTOHELP
     {NULL}
   };
@@ -67,7 +69,6 @@ int main(int argc, char *argv[]) {
   if (val != -1) {
     printf("ERROR: %d\n\n", val);
   }
-
 
   init_sender();
 
