@@ -6,11 +6,13 @@
 #include "firebase.h"
 #include "serial.h"
 #include "gpio.h"
+#include "cjson/cJSON.h"
 
 
 enum sender_type { SERIAL, GPIO };
 enum sender_type selected_sender = SERIAL;
 int selected_gpio_pin = 0;
+int DEFAULT_DEVICE = 28; // Old hard-coded device (for backwards compatibility)
 
 
 void init_sender() {
@@ -21,23 +23,37 @@ void init_sender() {
   }
 }
 
-void send_command(bool isOn, int device) {
+void send_command(bool isOn, int device, int index) {
   if (selected_sender == SERIAL) {
-    send_command_serial(isOn, device);
+    send_command_serial(isOn, device, index);
   } else {
-    send_command_gpio(isOn, device);
+    send_command_gpio(isOn, device, index);
   }
 }
 
 void parse_event_string(char* event) {
-  bool isOn = (strncmp(event, "on", 2) == 0);
+  bool isOn;
+  int device, index;
 
-  send_command(isOn, event[strlen(event)-1] - '0');
+  if (strchr(event, '{') == NULL) {
+    // Old message format: Use hard-coded device.
+    isOn = (strncmp(event, "on", 2) == 0);
+    index = event[strlen(event)-1] - '0';
+    device = DEFAULT_DEVICE;
+  } else {
+    cJSON *eventJson = cJSON_Parse(event);
+    isOn = cJSON_GetObjectItem(eventJson,"command")->type == cJSON_True;
+    device = cJSON_GetObjectItem(eventJson,"device")->valueint;
+    index = cJSON_GetObjectItem(eventJson,"index")->valueint;
+  }
+
+  send_command(isOn, device, index);
 }
 
 int main(int argc, char *argv[]) {
   int c;
-  int device = 0;
+  int device = DEFAULT_DEVICE;
+  int index = 0;
   bool isOn = false;
   char firebase_url[255];
   char *firebase_host = "";
@@ -47,6 +63,7 @@ int main(int argc, char *argv[]) {
     {"use-serial", 's', POPT_ARG_VAL, &selected_sender, SERIAL, "Use Serial sender", ""},
     {"use-gpio", 'g', POPT_ARG_VAL, &selected_sender, GPIO, "Use GPIO sender", ""},
     {"device", 'd', POPT_ARG_INT, &device, 0, "Device to command", ""},
+    {"index", 'i', POPT_ARG_INT, &index, 0, "Device index to command", ""},
     {"on", '1', POPT_ARG_VAL, &isOn, true, "Turns selected device on", ""},
     {"off", '0', POPT_ARG_VAL, &isOn, false, "Turns selected device off", ""},
     {"firebase", 'f', POPT_ARG_STRING, &firebase_host, 0, "Firebase hostname to connect to.", ""},
@@ -75,7 +92,7 @@ int main(int argc, char *argv[]) {
   if (firebase_host[0] == 0) {
     printf("Commanding remote\n\n");
   
-    send_command(isOn, device);
+    send_command(isOn, device, index);
   } else {
     sprintf(firebase_url, "https://%s.firebaseio.com/me.json", firebase_host);
     firebase_set_url(firebase_url);

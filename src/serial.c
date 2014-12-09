@@ -74,14 +74,17 @@ void init_sender_serial() {
   fd = open_port();
 }
 
-void send_command_serial(bool isOn, int device) {
-  char cmd[2];
+void send_command_serial(bool isOn, int device, int index) {
+  char cmd[4];
   cmd[0] = (isOn ? '1' : '0');
-  cmd[1] = '0' + device;
-  cmd[2] = '\0';
+  cmd[1] = '0' + index;
+  cmd[2] = '0' + (device / 10);
+  cmd[3] = '0' + (device % 10);
+  cmd[4] = '\0';
 
-  write(fd, cmd, 2);
+  write(fd, cmd, 4);
 
+  printf("%s\n\n", cmd);
   char buf[4];
   int n = read(fd, buf, sizeof buf);
 }

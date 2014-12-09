@@ -140,11 +140,11 @@ void init_sender_gpio(int selected_pin) {
   output_gpio();
 }
 
-void send_command_gpio(bool isOn, int device) {
+void send_command_gpio(bool isOn, int device, int index) {
   open_gpio();
 
   char c[3];
-  getCommand(isOn, device, 2, c);
+  getCommand(isOn, index, 2, c);
 
   repeatCommand(c);
 
