@@ -44,41 +44,41 @@ void export_gpio() {
   close(fd);
 }
 
-void getCommand(bool state, int index, int channel, char* c) {
-  char b0, b1;
+void getCommand(bool state, int device, int index, char* c) {
+  char commandByte, addressByte;
 
-  // State
-  bitWrite(b0, 7, state);
-  bitWrite(b0, 6, !state);
-
-  // All vs Single
-  bitWrite(b0, 3, index != 0);
-  bitWrite(b0, 2, index == 0);
-
-  // Channel
-  if (channel == 0) {
-    bitWrite(b1, 5, 1);
+  if (state) {
+    if (index == 0) {
+      commandByte = 0x84; // All On
+    } else {
+      commandByte = 0x88; // Individual On
+    }
   } else {
-    bitWrite(b1, 7, 1);
-    bitWrite(b1, 6, 1);
-    bitWrite(b1, 5, 1);
+    if (index == 0) {
+      commandByte = 0x44; // All Off
+    } else {
+      commandByte = 0x48; // Individual Off
+    }
   }
+
+  // Bit shift device number by 3 and cast to byte
+  addressByte = (char)(device << 3);
 
   switch(index) {
     case 1:
-      bitWrite(b1, 2, 1);
+      bitWrite(addressByte, 2, 1);
       break;
     case 2:
-      bitWrite(b1, 1, 1);
+      bitWrite(addressByte, 1, 1);
       break;
     case 3:
-      bitWrite(b1, 2, 1);
-      bitWrite(b1, 1, 1);
+      bitWrite(addressByte, 2, 1);
+      bitWrite(addressByte, 1, 1);
       break;
   }
 
-  c[0] = b0;
-  c[1] = b1;
+  c[0] = commandByte;
+  c[1] = addressByte;
   c[2] = 5; //B00000101;
 }
 
@@ -144,7 +144,7 @@ void send_command_gpio(bool isOn, int device, int index) {
   open_gpio();
 
   char c[3];
-  getCommand(isOn, index, 2, c);
+  getCommand(isOn, device, index, c);
 
   repeatCommand(c);
 
