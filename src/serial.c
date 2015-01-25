@@ -84,7 +84,6 @@ void send_command_serial(bool isOn, int device, int index) {
 
   write(fd, cmd, 4);
 
-  printf("%s\n\n", cmd);
   char buf[4];
   int n = read(fd, buf, sizeof buf);
 }

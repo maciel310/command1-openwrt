@@ -2,10 +2,11 @@
 
 START=90
 STOP=15
+SERVICE_DAEMONIZE=1
  
 start() {        
         echo Starting command1 daemon
-        service_start /bin/command1 -ftest &
+        service_start /bin/command1 -ftest
 }                 
  
 stop() {          
